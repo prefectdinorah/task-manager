@@ -13,13 +13,13 @@ const CHAT_ID = config.telegram.chatId;
 const title = process.argv[2] || 'Уведомление';
 const message = process.argv[3] || 'Обновление проекта';
 
-const fullMessage = \`🔔 *Task Manager*
+const fullMessage = `🔔 *Task Manager*
 
-*\${title}*
+*${title}*
 
-\${message}
+${message}
 
-_Отправлено из Claude Code_\`;
+_Отправлено из Claude Code_`;
 
 const data = JSON.stringify({
   chat_id: CHAT_ID,
@@ -30,7 +30,7 @@ const data = JSON.stringify({
 const options = {
   hostname: 'api.telegram.org',
   port: 443,
-  path: \`/bot\${BOT_TOKEN}/sendMessage\`,
+  path: `/bot${BOT_TOKEN}/sendMessage`,
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
