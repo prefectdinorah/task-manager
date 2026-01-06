@@ -62,7 +62,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             title,
             description: description || null,
             completed: false,
-          },
+          } as any,
         ])
         .select()
         .single();
