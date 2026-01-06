@@ -55,6 +55,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   addTask: async (title: string, description?: string) => {
     set({ isLoading: true, error: null });
     try {
+      // @ts-ignore - Supabase type inference issue
       const { data, error } = await supabase
         .from('tasks')
         .insert([
@@ -62,7 +63,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
             title,
             description: description || null,
             completed: false,
-          } as any,
+          },
         ])
         .select()
         .single();
