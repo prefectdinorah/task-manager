@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { Task } from '@/types/task.types';
 
+interface DatabaseTask {
+  id: string;
+  title: string;
+  description: string | null;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
@@ -25,7 +34,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
       if (error) throw error;
 
-      const tasks: Task[] = (data || []).map((task) => ({
+      const tasks: Task[] = ((data as DatabaseTask[]) || []).map((task) => ({
         id: task.id,
         title: task.title,
         description: task.description || undefined,
@@ -60,13 +69,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
       if (error) throw error;
 
+      const dbTask = data as DatabaseTask;
       const newTask: Task = {
-        id: data.id,
-        title: data.title,
-        description: data.description || undefined,
-        completed: data.completed,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
+        id: dbTask.id,
+        title: dbTask.title,
+        description: dbTask.description || undefined,
+        completed: dbTask.completed,
+        createdAt: new Date(dbTask.created_at),
+        updatedAt: new Date(dbTask.updated_at),
       };
 
       set({ tasks: [newTask, ...get().tasks], isLoading: false });
