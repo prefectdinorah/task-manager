@@ -11,9 +11,5 @@ next-env.d.ts
 .claude/config.json
 .claude/settings.local.json
 
-# Documentation files (excluding README)
-*.md
-!README.md
-
 # Playwright screenshots and artifacts
 .playwright-mcp/
