@@ -5,7 +5,15 @@ out
 .vercel
 *.log
 .DS_Store
+next-env.d.ts
 
 # Claude Code sensitive config
 .claude/config.json
 .claude/settings.local.json
+
+# Documentation files (excluding README)
+*.md
+!README.md
+
+# Playwright screenshots and artifacts
+.playwright-mcp/
