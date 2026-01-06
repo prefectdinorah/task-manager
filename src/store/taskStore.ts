@@ -15,14 +15,19 @@ interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
+  editingTaskId: string | null;
   fetchTasks: () => Promise<void>;
   addTask: (title: string, description?: string) => Promise<void>;
+  updateTask: (id: string, title: string, description?: string) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  setEditingTaskId: (id: string | null) => void;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [],
   isLoading: false,
   error: null,
+  editingTaskId: null,
 
   fetchTasks: async () => {
     set({ isLoading: true, error: null });
@@ -88,5 +93,71 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       });
       throw error;
     }
+  },
+
+  updateTask: async (id: string, title: string, description?: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      // @ts-ignore - Supabase type inference issue
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({
+          title,
+          description: description || null,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const dbTask = data as DatabaseTask;
+      const updatedTask: Task = {
+        id: dbTask.id,
+        title: dbTask.title,
+        description: dbTask.description || undefined,
+        completed: dbTask.completed,
+        createdAt: new Date(dbTask.created_at),
+        updatedAt: new Date(dbTask.updated_at),
+      };
+
+      set({
+        tasks: get().tasks.map((task) =>
+          task.id === id ? updatedTask : task
+        ),
+        isLoading: false,
+        editingTaskId: null,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to update task',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  deleteTask: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
+
+      if (error) throw error;
+
+      set({
+        tasks: get().tasks.filter((task) => task.id !== id),
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to delete task',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  setEditingTaskId: (id: string | null) => {
+    set({ editingTaskId: id });
   },
 }));
